@@ -12,13 +12,13 @@ export var bVal2 = b;
 
 //// [internalAliasFunctionInsideTopLevelModuleWithExport.js]
 define(["require", "exports"], function (require, exports) {
+    var a;
     (function (a) {
         function foo(x) {
             return x;
         }
         a.foo = foo;
-    })(exports.a || (exports.a = {}));
-    var a = exports.a;
+    })(a = exports.a || (exports.a = {}));
     exports.b = a.foo;
     exports.bVal = exports.b(10);
     exports.bVal2 = exports.b;
@@ -31,4 +31,4 @@ export declare module a {
 }
 export import b = a.foo;
 export declare var bVal: number;
-export declare var bVal2: (x: number) => number;
+export declare var bVal2: typeof b;

@@ -25,12 +25,12 @@ var m;
 var m1;
 (function (m1) {
     var x = m.c;
-    m1.d = new x();
+    m1.d = new x(); // emit the type as m.c
 })(m1 || (m1 = {}));
 var m2;
 (function (m2) {
     m2.x = m.c;
-    m2.d = new m2.x();
+    m2.d = new m2.x(); // emit the type as x
 })(m2 || (m2 = {}));
 
 
@@ -40,29 +40,10 @@ declare module m {
     }
 }
 declare module m1 {
+    import x = m.c;
     var d: x;
 }
 declare module m2 {
     export import x = m.c;
     var d: x;
 }
-
-
-//// [DtsFileErrors]
-
-
-==== tests/cases/compiler/declFileInternalAliases.d.ts (1 errors) ====
-    declare module m {
-        class c {
-        }
-    }
-    declare module m1 {
-        var d: x;
-               ~
-!!! Cannot find name 'x'.
-    }
-    declare module m2 {
-        export import x = m.c;
-        var d: x;
-    }
-    

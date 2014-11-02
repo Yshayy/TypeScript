@@ -1,9 +1,9 @@
 //// [classAndVariableWithSameName.ts]
-class C { foo: string; }
+class C { foo: string; } // error
 var C = ''; // error
 
 module M {
-    class D {
+    class D { // error
         bar: string;
     }
 
@@ -15,8 +15,8 @@ var C = (function () {
     function C() {
     }
     return C;
-})();
-var C = '';
+})(); // error
+var C = ''; // error
 var M;
 (function (M) {
     var D = (function () {
@@ -24,5 +24,5 @@ var M;
         }
         return D;
     })();
-    var D = 1;
+    var D = 1; // error
 })(M || (M = {}));

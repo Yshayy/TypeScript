@@ -13,6 +13,7 @@ export var bVal: b = b.Sunday;
 
 //// [internalAliasEnumInsideTopLevelModuleWithoutExport.js]
 define(["require", "exports"], function (require, exports) {
+    var a;
     (function (a) {
         (function (weekend) {
             weekend[weekend["Friday"] = 0] = "Friday";
@@ -20,8 +21,7 @@ define(["require", "exports"], function (require, exports) {
             weekend[weekend["Sunday"] = 2] = "Sunday";
         })(a.weekend || (a.weekend = {}));
         var weekend = a.weekend;
-    })(exports.a || (exports.a = {}));
-    var a = exports.a;
+    })(a = exports.a || (exports.a = {}));
     var b = a.weekend;
     exports.bVal = 2 /* Sunday */;
 });
@@ -35,21 +35,5 @@ export declare module a {
         Sunday = 2,
     }
 }
+import b = a.weekend;
 export declare var bVal: b;
-
-
-//// [DtsFileErrors]
-
-
-==== tests/cases/compiler/internalAliasEnumInsideTopLevelModuleWithoutExport.d.ts (1 errors) ====
-    export declare module a {
-        enum weekend {
-            Friday = 0,
-            Saturday = 1,
-            Sunday = 2,
-        }
-    }
-    export declare var bVal: b;
-                             ~
-!!! Cannot find name 'b'.
-    

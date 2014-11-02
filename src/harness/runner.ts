@@ -18,7 +18,6 @@
 // ///<reference path='fourslashRunner.ts' />
 /// <reference path='projectsRunner.ts' />
 /// <reference path='rwcRunner.ts' />
-/// <reference path='unittestrunner.ts' />
 
 function runTests(runners: RunnerBase[]) {
     if (reverse) {
@@ -41,7 +40,7 @@ var mytestconfig = 'mytest.config';
 var testconfig = 'test.config';
 var testConfigFile =
     Harness.IO.fileExists(mytestconfig) ? Harness.IO.readFile(mytestconfig) :
-    (Harness.IO.fileExists(testconfig) ? Harness.IO.readFile(testconfig) : '')
+    (Harness.IO.fileExists(testconfig) ? Harness.IO.readFile(testconfig) : '');
 
 if (testConfigFile !== '') {
     // TODO: not sure why this is crashing mocha
@@ -62,24 +61,13 @@ if (testConfigFile !== '') {
                 runners.push(new ProjectRunner());
                 break;
             case 'fourslash':
-                // TODO: Re-enable Fourslash tests
-                // runners.push(new FourslashRunner());
+                runners.push(new FourslashRunner());
                 break;
             case 'fourslash-generated':
-                // TODO: Re-enable Fourslash tests
-                // runners.push(new GeneratedFourslashRunner());
-                break;
-            case 'unittests':
-                runners.push(new UnitTestRunner(UnittestTestType.Compiler));
+                 runners.push(new GeneratedFourslashRunner());
                 break;
             case 'rwc':
                 runners.push(new RWCRunner());
-                break;
-            case 'ls':
-                runners.push(new UnitTestRunner(UnittestTestType.LanguageService));
-                break;
-            case 'services':
-                runners.push(new UnitTestRunner(UnittestTestType.Services));
                 break;
             case 'reverse':
                 reverse = true;
@@ -98,10 +86,9 @@ if (runners.length === 0) {
         runners.push(new ProjectRunner());
     }
 
-    //// language services
-    // TODO: Re-enable Fourslash runner
-    // runners.push(new FourslashRunner());
-    // runners.push(new GeneratedFourslashRunner());
+    // language services
+    runners.push(new FourslashRunner());
+    //runners.push(new GeneratedFourslashRunner());
 }
 
 sys.newLine = '\r\n';

@@ -103,6 +103,8 @@ module Sample.Thing.Languages.PlainText {
 
 
 //// [recursiveClassReferenceTest.js]
+// Scenario 1: Test reqursive function call with "this" parameter
+// Scenario 2: Test recursive function call with cast and "this" parameter
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -111,8 +113,11 @@ var __extends = this.__extends || function (d, b) {
 };
 var Sample;
 (function (Sample) {
+    var Actions;
     (function (Actions) {
+        var Thing;
         (function (_Thing) {
+            var Find;
             (function (Find) {
                 var StartFindAction = (function () {
                     function StartFindAction() {
@@ -126,21 +131,21 @@ var Sample;
                     return StartFindAction;
                 })();
                 Find.StartFindAction = StartFindAction;
-            })(_Thing.Find || (_Thing.Find = {}));
-            var Find = _Thing.Find;
-        })(Actions.Thing || (Actions.Thing = {}));
-        var Thing = Actions.Thing;
-    })(Sample.Actions || (Sample.Actions = {}));
-    var Actions = Sample.Actions;
+            })(Find = _Thing.Find || (_Thing.Find = {}));
+        })(Thing = Actions.Thing || (Actions.Thing = {}));
+    })(Actions = Sample.Actions || (Sample.Actions = {}));
 })(Sample || (Sample = {}));
 var Sample;
 (function (Sample) {
+    var Thing;
     (function (Thing) {
+        var Widgets;
         (function (Widgets) {
             var FindWidget = (function () {
                 function FindWidget(codeThing) {
                     this.codeThing = codeThing;
                     this.domNode = null;
+                    // scenario 1
                     codeThing.addWidget("addWidget", this);
                 }
                 FindWidget.prototype.gar = function (runner) {
@@ -156,10 +161,8 @@ var Sample;
                 return FindWidget;
             })();
             Widgets.FindWidget = FindWidget;
-        })(Thing.Widgets || (Thing.Widgets = {}));
-        var Widgets = Thing.Widgets;
-    })(Sample.Thing || (Sample.Thing = {}));
-    var Thing = Sample.Thing;
+        })(Widgets = Thing.Widgets || (Thing.Widgets = {}));
+    })(Thing = Sample.Thing || (Sample.Thing = {}));
 })(Sample || (Sample = {}));
 var AbstractMode = (function () {
     function AbstractMode() {
@@ -171,8 +174,11 @@ var AbstractMode = (function () {
 })();
 var Sample;
 (function (Sample) {
+    var Thing;
     (function (Thing) {
+        var Languages;
         (function (Languages) {
+            var PlainText;
             (function (PlainText) {
                 var State = (function () {
                     function State(mode) {
@@ -195,17 +201,15 @@ var Sample;
                     function Mode() {
                         _super.apply(this, arguments);
                     }
+                    // scenario 2
                     Mode.prototype.getInitialState = function () {
                         return new State(self);
                     };
                     return Mode;
                 })(AbstractMode);
                 PlainText.Mode = Mode;
-            })(Languages.PlainText || (Languages.PlainText = {}));
-            var PlainText = Languages.PlainText;
-        })(Thing.Languages || (Thing.Languages = {}));
-        var Languages = Thing.Languages;
-    })(Sample.Thing || (Sample.Thing = {}));
-    var Thing = Sample.Thing;
+            })(PlainText = Languages.PlainText || (Languages.PlainText = {}));
+        })(Languages = Thing.Languages || (Thing.Languages = {}));
+    })(Thing = Sample.Thing || (Sample.Thing = {}));
 })(Sample || (Sample = {}));
 //# sourceMappingURL=recursiveClassReferenceTest.js.map

@@ -12,6 +12,7 @@ export var cProp = new xc();
 var cReturnVal = cProp.foo(10);
 
 //// [internalAliasClassInsideTopLevelModuleWithoutExport.js]
+var x;
 (function (x) {
     var c = (function () {
         function c() {
@@ -22,8 +23,7 @@ var cReturnVal = cProp.foo(10);
         return c;
     })();
     x.c = c;
-})(exports.x || (exports.x = {}));
-var x = exports.x;
+})(x = exports.x || (exports.x = {}));
 var xc = x.c;
 exports.cProp = new xc();
 var cReturnVal = exports.cProp.foo(10);
@@ -35,19 +35,5 @@ export declare module x {
         foo(a: number): number;
     }
 }
+import xc = x.c;
 export declare var cProp: xc;
-
-
-//// [DtsFileErrors]
-
-
-==== tests/cases/compiler/internalAliasClassInsideTopLevelModuleWithoutExport.d.ts (1 errors) ====
-    export declare module x {
-        class c {
-            foo(a: number): number;
-        }
-    }
-    export declare var cProp: xc;
-                              ~~
-!!! Cannot find name 'xc'.
-    

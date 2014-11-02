@@ -2,7 +2,7 @@
 	"name": "typescript",
 	"author": "Microsoft Corp.",
 	"homepage": "http://typescriptlang.org/",
-	"version": "1.0.1",
+	"version": "1.3.0",
 	"licenses": [
 		{
 			"type": "Apache License 2.0", 
@@ -25,7 +25,7 @@
 		"url" : "https://github.com/Microsoft/TypeScript.git"  
 	},
 	"preferGlobal" : true,
-	"main" : "./bin/tc.js",
+	"main" : "./bin/tsc.js",
 	"bin" : { 
 		"tsc" : "./bin/tsc" 
 	},

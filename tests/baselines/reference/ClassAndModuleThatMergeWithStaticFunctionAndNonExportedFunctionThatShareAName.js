@@ -37,7 +37,7 @@ var Point;
 (function (Point) {
     function Origin() {
         return "";
-    }
+    } // not an error, since not exported
 })(Point || (Point = {}));
 var A;
 (function (A) {
@@ -52,10 +52,10 @@ var A;
         return Point;
     })();
     A.Point = Point;
+    var Point;
     (function (Point) {
         function Origin() {
             return "";
-        }
-    })(A.Point || (A.Point = {}));
-    var Point = A.Point;
+        } // not an error since not exported
+    })(Point = A.Point || (A.Point = {}));
 })(A || (A = {}));

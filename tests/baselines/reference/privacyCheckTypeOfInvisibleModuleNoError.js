@@ -15,23 +15,5 @@ var Outer;
     (function (Inner) {
         Inner.m;
     })(Inner || (Inner = {}));
-    Outer.f;
+    Outer.f; // Since we dont unwind inner any more, it is error here
 })(Outer || (Outer = {}));
-
-
-//// [privacyCheckTypeOfInvisibleModuleNoError.d.ts]
-declare module Outer {
-    var f: typeof Inner;
-}
-
-
-//// [DtsFileErrors]
-
-
-==== tests/cases/compiler/privacyCheckTypeOfInvisibleModuleNoError.d.ts (1 errors) ====
-    declare module Outer {
-        var f: typeof Inner;
-                      ~~~~~
-!!! Cannot find name 'Inner'.
-    }
-    

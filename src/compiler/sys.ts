@@ -1,21 +1,24 @@
-/// <reference path="diagnosticInformationMap.generated.ts"/>
 
 interface System {
     args: string[];
     newLine: string;
     useCaseSensitiveFileNames: boolean;
     write(s: string): void;
-    writeErr(s: string): void;
     readFile(fileName: string, encoding?: string): string;
-    writeFile(fileName: string, data: string): void;
+    writeFile(fileName: string, data: string, writeByteOrderMark?: boolean): void;
+    watchFile?(fileName: string, callback: (fileName: string) => void): FileWatcher;
     resolvePath(path: string): string;
     fileExists(path: string): boolean;
     directoryExists(path: string): boolean;
     createDirectory(directoryName: string): void;
     getExecutingFilePath(): string;
     getCurrentDirectory(): string;
-    getMemoryUsage(): number;
+    getMemoryUsage?(): number;
     exit(exitCode?: number): void;
+}
+
+interface FileWatcher {
+    close(): void;
 }
 
 declare var require: any;
@@ -64,22 +67,28 @@ var sys: System = (function () {
                 return fileStream.ReadText();
             }
             catch (e) {
-                throw e.number === -2147024809 ? new Error(ts.Diagnostics.Unsupported_file_encoding.key) : e;
+                throw e;
             }
             finally {
                 fileStream.Close();
             }
         }
 
-        function writeFile(fileName: string, data: string): void {
+        function writeFile(fileName: string, data: string, writeByteOrderMark?: boolean): void {
             fileStream.Open();
             binaryStream.Open();
             try {
                 // Write characters in UTF-8 encoding
                 fileStream.Charset = "utf-8";
                 fileStream.WriteText(data);
-                // Skip byte order mark and copy remaining data to binary stream
-                fileStream.Position = 3;
+                // If we don't want the BOM, then skip it by setting the starting location to 3 (size of BOM).
+                // If not, start from position 0, as the BOM will be added automatically when charset==utf8.
+                if (writeByteOrderMark) {
+                    fileStream.Position = 0;
+                }
+                else {
+                    fileStream.Position = 3;
+                }
                 fileStream.CopyTo(binaryStream);
                 binaryStream.SaveToFile(fileName, 2 /*overwrite*/);
             }
@@ -95,9 +104,6 @@ var sys: System = (function () {
             useCaseSensitiveFileNames: false,
             write(s: string): void {
                 WScript.StdOut.Write(s);
-            },
-            writeErr(s: string): void {
-                WScript.StdErr.Write(s);
             },
             readFile: readFile,
             writeFile: writeFile,
@@ -120,9 +126,6 @@ var sys: System = (function () {
             },
             getCurrentDirectory() {
                 return new ActiveXObject("WScript.Shell").CurrentDirectory;
-            },
-            getMemoryUsage() {
-                return 0;
             },
             exit(exitCode?: number): void {
                 try {
@@ -171,7 +174,12 @@ var sys: System = (function () {
             return buffer.toString("utf8");
         }
 
-        function writeFile(fileName: string, data: string): void {
+        function writeFile(fileName: string, data: string, writeByteOrderMark?: boolean): void {
+            // If a BOM is required, emit one
+            if (writeByteOrderMark) {
+                data = '\uFEFF' + data;
+            }
+
             _fs.writeFileSync(fileName, data, "utf8");
         }
 
@@ -180,13 +188,27 @@ var sys: System = (function () {
             newLine: _os.EOL,
             useCaseSensitiveFileNames: useCaseSensitiveFileNames,
             write(s: string): void {
-                process.stdout.write(s);
-            },
-            writeErr(s: string): void {
-                process.stderr.write(s);
+               // 1 is a standard descriptor for stdout
+               _fs.writeSync(1, s);
             },
             readFile: readFile,
             writeFile: writeFile,
+            watchFile: (fileName, callback) => {
+                // watchFile polls a file every 250ms, picking up file notifications.
+                _fs.watchFile(fileName, { persistent: true, interval: 250 }, fileChanged);
+
+                return {
+                    close() { _fs.unwatchFile(fileName, fileChanged); }
+                };
+
+                function fileChanged(curr: any, prev: any) {
+                    if (+curr.mtime <= +prev.mtime) {
+                        return;
+                    }
+
+                    callback(fileName);
+                };
+            },
             resolvePath: function (path: string): string {
                 return _path.resolve(path);
             },
@@ -208,7 +230,9 @@ var sys: System = (function () {
                 return (<any>process).cwd();
             },
             getMemoryUsage() {
-                global.gc();
+                if (global.gc) {
+                    global.gc();
+                }
                 return process.memoryUsage().heapUsed;
             },
             exit(exitCode?: number): void {

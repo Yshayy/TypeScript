@@ -39,6 +39,7 @@ module Foo.Bar {
 //// [sourceMapValidationClasses.js]
 var Foo;
 (function (Foo) {
+    var Bar;
     (function (Bar) {
         "use strict";
         var Greeter = (function () {
@@ -60,7 +61,7 @@ var Foo;
             for (var _i = 1; _i < arguments.length; _i++) {
                 restGreetings[_i - 1] = arguments[_i];
             }
-            var greeters = [];
+            var greeters = []; /* inline block comment */
             greeters[0] = new Greeter(greeting);
             for (var i = 0; i < restGreetings.length; i++) {
                 greeters.push(new Greeter(restGreetings[i]));
@@ -71,7 +72,6 @@ var Foo;
         for (var j = 0; j < b.length; j++) {
             b[j].greet();
         }
-    })(Foo.Bar || (Foo.Bar = {}));
-    var Bar = Foo.Bar;
+    })(Bar = Foo.Bar || (Foo.Bar = {}));
 })(Foo || (Foo = {}));
 //# sourceMappingURL=sourceMapValidationClasses.js.map

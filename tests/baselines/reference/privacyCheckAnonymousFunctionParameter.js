@@ -17,7 +17,7 @@ module Query {
 
 
 //// [privacyCheckAnonymousFunctionParameter.js]
-exports.x = 1;
+exports.x = 1; // Makes this an external module
 var Query;
 (function (Query) {
     function fromDoWhile(doWhile) {
@@ -30,3 +30,7 @@ var Query;
         });
     }
 })(Query || (Query = {}));
+
+
+//// [privacyCheckAnonymousFunctionParameter.d.ts]
+export declare var x: number;

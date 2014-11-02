@@ -1,8 +1,8 @@
 //// [callOverloads4.ts]
 
-function Foo():Foo;
-function Foo(s:string):Foo;
-class Foo {    
+function Foo():Foo; // error
+function Foo(s:string):Foo; // error
+class Foo { // error
     bar1() { /*WScript.Echo("bar1");*/ }
     constructor(s: string);
     constructor(x: any) {
@@ -21,6 +21,7 @@ Foo("s");
 //// [callOverloads4.js]
 var Foo = (function () {
     function Foo(x) {
+        // WScript.Echo("Constructor function has executed");
     }
     Foo.prototype.bar1 = function () {
     };

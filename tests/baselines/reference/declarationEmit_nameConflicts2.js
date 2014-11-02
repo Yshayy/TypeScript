@@ -9,7 +9,6 @@ module X.Y.base {
 }
 
 module X.Y.base.Z {
-    // Bug 887180
     export var f = X.Y.base.f; // Should be base.f
     export var C = X.Y.base.C; // Should be base.C
     export var M = X.Y.base.M; // Should be base.M
@@ -19,7 +18,9 @@ module X.Y.base.Z {
 //// [declarationEmit_nameConflicts2.js]
 var X;
 (function (X) {
+    var Y;
     (function (Y) {
+        var base;
         (function (base) {
             function f() {
             }
@@ -30,33 +31,31 @@ var X;
                 return C;
             })();
             base.C = C;
+            var M;
             (function (M) {
                 M.v;
-            })(base.M || (base.M = {}));
-            var M = base.M;
+            })(M = base.M || (base.M = {}));
             (function (E) {
             })(base.E || (base.E = {}));
             var E = base.E;
-        })(Y.base || (Y.base = {}));
-        var base = Y.base;
-    })(X.Y || (X.Y = {}));
-    var Y = X.Y;
+        })(base = Y.base || (Y.base = {}));
+    })(Y = X.Y || (X.Y = {}));
 })(X || (X = {}));
 var X;
 (function (X) {
+    var Y;
     (function (Y) {
+        var base;
         (function (base) {
+            var Z;
             (function (Z) {
-                Z.f = X.Y.base.f;
-                Z.C = X.Y.base.C;
-                Z.M = X.Y.base.M;
-                Z.E = X.Y.base.E;
-            })(base.Z || (base.Z = {}));
-            var Z = base.Z;
-        })(Y.base || (Y.base = {}));
-        var base = Y.base;
-    })(X.Y || (X.Y = {}));
-    var Y = X.Y;
+                Z.f = X.Y.base.f; // Should be base.f
+                Z.C = X.Y.base.C; // Should be base.C
+                Z.M = X.Y.base.M; // Should be base.M
+                Z.E = X.Y.base.E; // Should be base.E
+            })(Z = base.Z || (base.Z = {}));
+        })(base = Y.base || (Y.base = {}));
+    })(Y = X.Y || (X.Y = {}));
 })(X || (X = {}));
 
 
@@ -72,7 +71,7 @@ declare module X.Y.base {
     }
 }
 declare module X.Y.base.Z {
-    var f: () => void;
+    var f: typeof base.f;
     var C: typeof base.C;
     var M: typeof base.M;
     var E: typeof base.E;

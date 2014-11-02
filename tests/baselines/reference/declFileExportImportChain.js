@@ -28,6 +28,7 @@ export var x: c.b1.a.m2.c1;
 define(["require", "exports"], function (require, exports) {
     var m1;
     (function (m1) {
+        var m2;
         (function (m2) {
             var c1 = (function () {
                 function c1() {
@@ -35,8 +36,7 @@ define(["require", "exports"], function (require, exports) {
                 return c1;
             })();
             m2.c1 = c1;
-        })(m1.m2 || (m1.m2 = {}));
-        var m2 = m1.m2;
+        })(m2 = m1.m2 || (m1.m2 = {}));
     })(m1 || (m1 = {}));
     return m1;
 });
@@ -74,33 +74,5 @@ export = b;
 //// [declFileExportImportChain_c.d.ts]
 export import b1 = require("declFileExportImportChain_b1");
 //// [declFileExportImportChain_d.d.ts]
-export declare var x: m1.m2.c1;
-
-
-//// [DtsFileErrors]
-
-
-==== tests/cases/compiler/declFileExportImportChain_d.d.ts (1 errors) ====
-    export declare var x: m1.m2.c1;
-                          ~~~~~~~~
-!!! Cannot find name 'm1'.
-    
-==== tests/cases/compiler/declFileExportImportChain_a.d.ts (0 errors) ====
-    declare module m1 {
-        module m2 {
-            class c1 {
-            }
-        }
-    }
-    export = m1;
-    
-==== tests/cases/compiler/declFileExportImportChain_b.d.ts (0 errors) ====
-    export import a = require("declFileExportImportChain_a");
-    
-==== tests/cases/compiler/declFileExportImportChain_b1.d.ts (0 errors) ====
-    import b = require("declFileExportImportChain_b");
-    export = b;
-    
-==== tests/cases/compiler/declFileExportImportChain_c.d.ts (0 errors) ====
-    export import b1 = require("declFileExportImportChain_b1");
-    
+import c = require("declFileExportImportChain_c");
+export declare var x: c.b1.a.m2.c1;

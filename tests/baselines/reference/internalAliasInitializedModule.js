@@ -14,6 +14,7 @@ module c {
 //// [internalAliasInitializedModule.js]
 var a;
 (function (a) {
+    var b;
     (function (b) {
         var c = (function () {
             function c() {
@@ -21,8 +22,7 @@ var a;
             return c;
         })();
         b.c = c;
-    })(a.b || (a.b = {}));
-    var b = a.b;
+    })(b = a.b || (a.b = {}));
 })(a || (a = {}));
 var c;
 (function (c) {
@@ -39,23 +39,6 @@ declare module a {
     }
 }
 declare module c {
+    import b = a.b;
     var x: b.c;
 }
-
-
-//// [DtsFileErrors]
-
-
-==== tests/cases/compiler/internalAliasInitializedModule.d.ts (1 errors) ====
-    declare module a {
-        module b {
-            class c {
-            }
-        }
-    }
-    declare module c {
-        var x: b.c;
-               ~~~
-!!! Cannot find name 'b'.
-    }
-    

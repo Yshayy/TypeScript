@@ -14,6 +14,11 @@ interface ArrayBuffer {
       * Read-only. The length of the ArrayBuffer (in bytes).
       */
     byteLength: number;
+
+    /**
+      * Returns a section of an ArrayBuffer.
+      */
+    slice(begin:number, end?:number): ArrayBuffer;
 }
 
 declare var ArrayBuffer: {
@@ -58,14 +63,14 @@ interface Int8Array extends ArrayBufferView {
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: Int8Array, offset?: number): void;
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: number[], offset?: number): void;
@@ -116,14 +121,14 @@ interface Uint8Array extends ArrayBufferView {
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: Uint8Array, offset?: number): void;
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: number[], offset?: number): void;
@@ -174,14 +179,14 @@ interface Int16Array extends ArrayBufferView {
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: Int16Array, offset?: number): void;
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: number[], offset?: number): void;
@@ -232,14 +237,14 @@ interface Uint16Array extends ArrayBufferView {
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: Uint16Array, offset?: number): void;
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: number[], offset?: number): void;
@@ -290,14 +295,14 @@ interface Int32Array extends ArrayBufferView {
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: Int32Array, offset?: number): void;
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: number[], offset?: number): void;
@@ -348,14 +353,14 @@ interface Uint32Array extends ArrayBufferView {
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: Uint32Array, offset?: number): void;
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: number[], offset?: number): void;
@@ -406,14 +411,14 @@ interface Float32Array extends ArrayBufferView {
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: Float32Array, offset?: number): void;
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: number[], offset?: number): void;
@@ -464,14 +469,14 @@ interface Float64Array extends ArrayBufferView {
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: Float64Array, offset?: number): void;
 
     /**
       * Sets a value or an array of values.
-      * @param A typed or untyped array of values to set.
+      * @param array A typed or untyped array of values to set.
       * @param offset The index in the current array at which the values are to be written.
       */
     set(array: number[], offset?: number): void;

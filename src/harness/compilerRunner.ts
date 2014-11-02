@@ -39,19 +39,21 @@ class CompilerBaselineRunner extends RunnerBase {
 
     public checkTestCodeOutput(fileName: string) {
         describe('compiler tests for ' + fileName, () => {
-            // strips the fileName from the path.
-            var justName = fileName.replace(/^.*[\\\/]/, '');
-            var content = Harness.IO.readFile(fileName);
-            var testCaseContent = Harness.TestCaseParser.makeUnitsFromTest(content, fileName);
+            // Mocha holds onto the closure environment of the describe callback even after the test is done.
+            // Everything declared here should be cleared out in the "after" callback.
+            var justName: string;
+            var content: string;
+            var testCaseContent: { settings: Harness.TestCaseParser.CompilerSetting[]; testUnitData: Harness.TestCaseParser.TestUnitData[]; }
 
-            var units = testCaseContent.testUnitData;
-            var tcSettings = testCaseContent.settings;
-            var createNewInstance = false;
+            var units: Harness.TestCaseParser.TestUnitData[];
+            var tcSettings: Harness.TestCaseParser.CompilerSetting[];
+            var createNewInstance: boolean;
 
-            var lastUnit = units[units.length - 1];
-            var rootDir = lastUnit.originalFilePath.indexOf('conformance') === -1 ? 'tests/cases/compiler/' : lastUnit.originalFilePath.substring(0, lastUnit.originalFilePath.lastIndexOf('/')) + '/';
+            var lastUnit: Harness.TestCaseParser.TestUnitData;
+            var rootDir: string;
 
             var result: Harness.Compiler.CompilerResult;
+            var checker: ts.TypeChecker;
             var options: ts.CompilerOptions;
             // equivalent to the files that will be passed on the command line
             var toBeCompiled: { unitName: string; content: string }[];
@@ -59,13 +61,23 @@ class CompilerBaselineRunner extends RunnerBase {
             var otherFiles: { unitName: string; content: string }[];
             var harnessCompiler: Harness.Compiler.HarnessCompiler;
 
-            var declToBeCompiled: { unitName: string; content: string }[] = [];
-            var declOtherFiles: { unitName: string; content: string }[] = [];
-            var declResult: Harness.Compiler.CompilerResult;
+            var declFileCompilationResult: {
+                declInputFiles: { unitName: string; content: string }[];
+                declOtherFiles: { unitName: string; content: string }[];
+                declResult: Harness.Compiler.CompilerResult;
+            };
 
             var createNewInstance = false;
 
             before(() => {
+                justName = fileName.replace(/^.*[\\\/]/, ''); // strips the fileName from the path.
+                content = Harness.IO.readFile(fileName);
+                testCaseContent = Harness.TestCaseParser.makeUnitsFromTest(content, fileName);
+                units = testCaseContent.testUnitData;
+                tcSettings = testCaseContent.settings;
+                createNewInstance = false;
+                lastUnit = units[units.length - 1];
+                rootDir = lastUnit.originalFilePath.indexOf('conformance') === -1 ? 'tests/cases/compiler/' : lastUnit.originalFilePath.substring(0, lastUnit.originalFilePath.lastIndexOf('/')) + '/';
                 harnessCompiler = Harness.Compiler.getCompiler();
                 // We need to assemble the list of input files for the compiler and other related files on the 'filesystem' (ie in a multi-file test)
                 // If the last file in a test uses require or a triple slash reference we'll assume all other files will be brought in via references,
@@ -85,8 +97,10 @@ class CompilerBaselineRunner extends RunnerBase {
                     });
                 }
 
-                options = harnessCompiler.compileFiles(toBeCompiled, otherFiles, function (compileResult) {
+                options = harnessCompiler.compileFiles(toBeCompiled, otherFiles, function (compileResult, _checker) {
                     result = compileResult;
+                    // The checker will be used by typeWriter
+                    checker = _checker;
                 }, function (settings) {
                         harnessCompiler.setCompilerSettings(tcSettings);
                 });
@@ -97,6 +111,7 @@ class CompilerBaselineRunner extends RunnerBase {
                    a fresh compiler instance for themselves and then create a fresh one for the next test. Would be nice to get dev fixes
                    eventually to remove this limitation. */
                 for (var i = 0; i < tcSettings.length; ++i) {
+                    // noImplicitAny is passed to getCompiler, but target is just passed in the settings blob to setCompilerSettings
                     if (!createNewInstance && (tcSettings[i].flag == "noimplicitany" || tcSettings[i].flag === 'target')) {
                         harnessCompiler = Harness.Compiler.getCompiler({
                             useExistingInstance: false,
@@ -118,97 +133,31 @@ class CompilerBaselineRunner extends RunnerBase {
                 }
             });
 
-            function getErrorBaseline(toBeCompiled: { unitName: string; content: string }[],
-                otherFiles: { unitName: string; content: string }[],
-                result: Harness.Compiler.CompilerResult
-                ) {
+            after(() => {
+                // Mocha holds onto the closure environment of the describe callback even after the test is done.
+                // Therefore we have to clean out large objects after the test is done.
+                justName = undefined;
+                content = undefined;
+                testCaseContent = undefined;
+                units = undefined;
+                tcSettings = undefined;
+                lastUnit = undefined;
+                rootDir = undefined;
+                result = undefined;
+                checker = undefined;
+                options = undefined;
+                toBeCompiled = undefined;
+                otherFiles = undefined;
+                harnessCompiler = undefined;
+                declFileCompilationResult = undefined;
+            });
 
-                var outputLines: string[] = [];
-                // Count up all the errors we find so we don't miss any
-                var totalErrorsReported = 0;
-                
-                function outputErrorText(error: Harness.Compiler.MinimalDiagnostic) {
-                    var errLines = RunnerBase.removeFullPaths(error.message)
-                        .split('\n')
-                        .map(s => s.length > 0 && s.charAt(s.length - 1) === '\r' ? s.substr(0, s.length - 1) : s)
-                        .filter(s => s.length > 0)
-                        .map(s => '!!! ' + s);
-                    errLines.forEach(e => outputLines.push(e));
+            function getByteOrderMarkText(file: Harness.Compiler.GeneratedFile): string {
+                return file.writeByteOrderMark ? "\u00EF\u00BB\u00BF" : "";
+            }
 
-                    totalErrorsReported++;
-                }
-
-                // Report glovbal errors:
-                var globalErrors = result.errors.filter(err => !err.filename);
-                globalErrors.forEach(err => outputErrorText(err));
-
-                // 'merge' the lines of each input file with any errors associated with it
-                toBeCompiled.concat(otherFiles).forEach(inputFile => {
-                    // Filter down to the errors in the file
-                    var fileErrors = result.errors.filter(e => {
-                        var errFn = e.filename;
-                        return errFn && errFn === inputFile.unitName;
-                    });
-
-
-                    // Header
-                    outputLines.push('==== ' + inputFile.unitName + ' (' + fileErrors.length + ' errors) ====');
-
-                    // Make sure we emit something for every error
-                    var markedErrorCount = 0;
-                    // For each line, emit the line followed by any error squiggles matching this line
-                    // Note: IE JS engine incorrectly handles consecutive delimiters here when using RegExp split, so
-                    // we have to string-based splitting instead and try to figure out the delimiting chars
-
-                    var lineStarts = ts.getLineStarts(inputFile.content);
-                    var lines = inputFile.content.split('\n');
-                    lines.forEach((line, lineIndex) => {
-                        if (line.length > 0 && line.charAt(line.length - 1) === '\r') {
-                            line = line.substr(0, line.length - 1);
-                        }
-
-                        var thisLineStart = lineStarts[lineIndex];
-                        var nextLineStart: number;
-                        // On the last line of the file, fake the next line start number so that we handle errors on the last character of the file correctly
-                        if (lineIndex === lines.length - 1) {
-                            nextLineStart = inputFile.content.length;
-                        } else {
-                            nextLineStart = lineStarts[lineIndex + 1];
-                        }
-                        // Emit this line from the original file
-                        outputLines.push('    ' + line);
-                        fileErrors.forEach(err => {
-                            // Does any error start or continue on to this line? Emit squiggles
-                            if ((err.end >= thisLineStart) && ((err.start < nextLineStart) || (lineIndex === lines.length - 1))) {
-                                // How many characters from the start of this line the error starts at (could be positive or negative)
-                                var relativeOffset = err.start - thisLineStart;
-                                // How many characters of the error are on this line (might be longer than this line in reality)
-                                var length = (err.end - err.start) - Math.max(0, thisLineStart - err.start);
-                                // Calculate the start of the squiggle
-                                var squiggleStart = Math.max(0, relativeOffset);
-                                // TODO/REVIEW: this doesn't work quite right in the browser if a multi file test has files whose names are just the right length relative to one another
-                                outputLines.push('    ' + line.substr(0, squiggleStart).replace(/[^\s]/g, ' ') + new Array(Math.min(length, line.length - squiggleStart) + 1).join('~'));
-
-                                // If the error ended here, or we're at the end of the file, emit its message
-                                if ((lineIndex === lines.length - 1) || nextLineStart > err.end) {
-                                    // Just like above, we need to do a split on a string instead of on a regex
-                                    // because the JS engine does regexes wrong
-
-                                    outputErrorText(err);
-                                    markedErrorCount++;
-                                }
-                            }
-                        });
-                    });
-
-                    // Verify we didn't miss any errors in this file
-                    assert.equal(markedErrorCount, fileErrors.length, 'count of errors in ' + inputFile.unitName);
-                });
-
-                // Verify we didn't miss any errors in total
-                assert.equal(totalErrorsReported, result.errors.length, 'total number of errors');
-
-                return outputLines.join('\r\n');
+            function getErrorBaseline(toBeCompiled: { unitName: string; content: string }[], otherFiles: { unitName: string; content: string }[], result: Harness.Compiler.CompilerResult) {
+                return Harness.Compiler.getErrorBaseline(toBeCompiled.concat(otherFiles), result.errors);
             }
 
             // check errors
@@ -216,7 +165,7 @@ class CompilerBaselineRunner extends RunnerBase {
                 if (this.errors) {
                     Harness.Baseline.runBaseline('Correct errors for ' + fileName, justName.replace(/\.ts$/, '.errors.txt'), (): string => {
                         if (result.errors.length === 0) return null;
-
+                        
                         return getErrorBaseline(toBeCompiled, otherFiles, result);
                     });
                 }
@@ -224,40 +173,18 @@ class CompilerBaselineRunner extends RunnerBase {
 
             // Source maps?
             it('Correct sourcemap content for ' + fileName, () => {
-                if (result.sourceMapRecord) {
+                if (options.sourceMap) {
                     Harness.Baseline.runBaseline('Correct sourcemap content for ' + fileName, justName.replace(/\.ts$/, '.sourcemap.txt'), () => {
-                        return result.sourceMapRecord;
+                        return result.getSourceMapRecord();
                     });
                 }
             });
 
             // Compile .d.ts files
             it('Correct compiler generated.d.ts for ' + fileName, () => {
-                if (options.declaration && result.errors.length === 0 && result.declFilesCode.length !== result.files.length) {
-                    throw new Error('There were no errors and declFiles generated did not match number of js files generated');
-                }
-
-                // if the .d.ts is non-empty, confirm it compiles correctly as well
-                if (options.declaration && result.errors.length === 0 && result.declFilesCode.length > 0) {
-                    function getDtsFile(file: { unitName: string; content: string }) {
-                        if (Harness.Compiler.isDTS(file.unitName)) {
-                            return file;
-                        } else {
-                            var declFile = ts.forEach(result.declFilesCode,
-                                declFile => declFile.fileName === (file.unitName.substr(0, file.unitName.length - ".ts".length) + ".d.ts")
-                                    ? declFile : undefined);
-                            return { unitName: rootDir + Harness.Path.getFileName(declFile.fileName), content: declFile.code };
-                        }
-                    }
-
-                    ts.forEach(toBeCompiled, file => { declToBeCompiled.push(getDtsFile(file)); });
-                    ts.forEach(otherFiles, file => { declOtherFiles.push(getDtsFile(file)); });
-                    harnessCompiler.compileFiles(declToBeCompiled, declOtherFiles, function (compileResult) {
-                        declResult = compileResult;
-                    }, function (settings) {
-                            harnessCompiler.setCompilerSettings(tcSettings);
-                    });
-                }
+                declFileCompilationResult = harnessCompiler.compileDeclarationFiles(toBeCompiled, otherFiles, result, function (settings) {
+                    harnessCompiler.setCompilerSettings(tcSettings);
+                }, options);
             });
 
 
@@ -282,6 +209,7 @@ class CompilerBaselineRunner extends RunnerBase {
                         var jsCode = '';
                         for (var i = 0; i < result.files.length; i++) {
                             jsCode += '//// [' + Harness.Path.getFileName(result.files[i].fileName) + ']\r\n';
+                            jsCode += getByteOrderMarkText(result.files[i]);
                             jsCode += result.files[i].code;
                             // Re-enable this if we want to do another comparison of old vs new compiler baselines
                             // jsCode += SyntacticCleaner.clean(result.files[i].code);
@@ -289,16 +217,17 @@ class CompilerBaselineRunner extends RunnerBase {
 
                         if (result.declFilesCode.length > 0) {
                             jsCode += '\r\n\r\n';
-                            for (var i = 0; i < result.files.length; i++) {
+                            for (var i = 0; i < result.declFilesCode.length; i++) {
                                 jsCode += '//// [' + Harness.Path.getFileName(result.declFilesCode[i].fileName) + ']\r\n';
+                                jsCode += getByteOrderMarkText(result.declFilesCode[i]);
                                 jsCode += result.declFilesCode[i].code;
                             }
                         }
 
-                        if (declResult && declResult.errors.length) {
+                        if (declFileCompilationResult && declFileCompilationResult.declResult.errors.length) {
                             jsCode += '\r\n\r\n//// [DtsFileErrors]\r\n';
                             jsCode += '\r\n\r\n';
-                            jsCode += getErrorBaseline(declToBeCompiled, declOtherFiles, declResult);
+                            jsCode += getErrorBaseline(declFileCompilationResult.declInputFiles, declFileCompilationResult.declOtherFiles, declFileCompilationResult.declResult);
                         }
 
                         if (jsCode.length > 0) {
@@ -320,6 +249,7 @@ class CompilerBaselineRunner extends RunnerBase {
                         var sourceMapCode = '';
                         for (var i = 0; i < result.sourceMaps.length; i++) {
                             sourceMapCode += '//// [' + Harness.Path.getFileName(result.sourceMaps[i].fileName) + ']\r\n';
+                            sourceMapCode += getByteOrderMarkText(result.sourceMaps[i]);
                             sourceMapCode += result.sourceMaps[i].code;
                         }
 
@@ -330,35 +260,18 @@ class CompilerBaselineRunner extends RunnerBase {
 
             it('Correct type baselines for ' + fileName, () => {
                 // NEWTODO: Type baselines
-                if (/* ! */ false && /* ! */ result.errors.length === 0) {
+                if (result.errors.length === 0) {
                     Harness.Baseline.runBaseline('Correct expression types for ' + fileName, justName.replace(/\.ts/, '.types'), () => {
-                        // TODO: Rewrite this part
-                        //var compiler = new TypeScript.TypeScriptCompiler(
-                        //    new TypeScript.NullLogger(), TypeScript.ImmutableCompilationSettings.defaultSettings());
-
-                        //compiler.addFile('lib.d.ts', TypeScript.ScriptSnapshot.fromString(Harness.Compiler.libTextMinimal),
-                        //    TypeScript.ByteOrderMark.None, /*version:*/ "0", /*isOpen:*/ true);
-
-                        //var allFiles = toBeCompiled.concat(otherFiles);
-                        //allFiles.forEach(file => {
-                        //    compiler.addFile(file.unitName, TypeScript.ScriptSnapshot.fromString(file.content),
-                        //        TypeScript.ByteOrderMark.None, /*version:*/ "0", /*isOpen:*/ true);
-                        //});
-
-                        var allFiles: any[] = [];
-                        var compiler: any = undefined;
-
-                        var typeBaselineText = '';
+                        var allFiles = toBeCompiled.concat(otherFiles).filter(file => !!checker.getProgram().getSourceFile(file.unitName));
                         var typeLines: string[] = [];
                         var typeMap: { [fileName: string]: { [lineNum: number]: string[]; } } = {};
+                        var walker = new TypeWriterWalker(checker);
                         allFiles.forEach(file => {
                             var codeLines = file.content.split('\n');
-                            var walker = new TypeWriterWalker(file.unitName, compiler);
-                            walker.run();
-                            walker.results.forEach(result => {
-                                var formattedLine = result.identifierName + " : " + result.type;
+                            walker.getTypes(file.unitName).forEach(result => {
+                                var formattedLine = result.sourceText.replace(/\r?\n/g, "") + " : " + result.type;
                                 if (!typeMap[file.unitName]) {
-                                    typeMap[file.unitName] = {}
+                                    typeMap[file.unitName] = {};
                                 }
 
                                 var typeInfo = [formattedLine];
@@ -367,23 +280,6 @@ class CompilerBaselineRunner extends RunnerBase {
                                     typeInfo = existingTypeInfo.concat(typeInfo);
                                 }
                                 typeMap[file.unitName][result.line] = typeInfo;
-                            });
-
-                            var typeBaselineText = '';
-                            var typeLines: string[] = [];
-                            var typeMap: { [fileName: string]: { [lineNum: number]: string[]; } } = {};
-                            allFiles.forEach(file => {
-                                var codeLines = file.content.split('\n');
-                                var walker = new TypeWriterWalker(file.unitName, compiler);
-                                walker.run();
-                                walker.results.forEach(result => {
-                                    var formattedLine = result.identifierName + " : " + result.type;
-                                    if (!typeMap[file.unitName]) {
-                                        typeMap[file.unitName] = {}
-                                    } else {
-                                        typeLines.push('No type information for this code.');
-                                    }
-                                });
                             });
 
                             typeLines.push('=== ' + file.unitName + ' ===\r\n');

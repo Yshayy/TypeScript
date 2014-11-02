@@ -16,7 +16,7 @@ module Q {
 
 //// [privacyCheckAnonymousFunctionParameter2.js]
 define(["require", "exports"], function (require, exports) {
-    exports.x = 1;
+    exports.x = 1; // Makes this an external module 
     var Q;
     (function (Q) {
         function foo(x) {
@@ -31,3 +31,7 @@ define(["require", "exports"], function (require, exports) {
         }
     })(Q || (Q = {}));
 });
+
+
+//// [privacyCheckAnonymousFunctionParameter2.d.ts]
+export declare var x: number;

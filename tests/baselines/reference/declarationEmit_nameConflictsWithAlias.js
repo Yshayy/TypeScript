@@ -1,5 +1,4 @@
 //// [declarationEmit_nameConflictsWithAlias.ts]
-// Bug 887180
 export module C { export interface I { } }
 export import v = C;
 export module M {
@@ -8,10 +7,10 @@ export module M {
 }
 
 //// [declarationEmit_nameConflictsWithAlias.js]
+var M;
 (function (M) {
-    M.w;
-})(exports.M || (exports.M = {}));
-var M = exports.M;
+    M.w; // Gets emitted as C.I, which is the wrong interface
+})(M = exports.M || (exports.M = {}));
 
 
 //// [declarationEmit_nameConflictsWithAlias.d.ts]

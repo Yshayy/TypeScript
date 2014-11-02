@@ -50,12 +50,12 @@ var M;
 })(M || (M = {}));
 var M;
 (function (M) {
+    var Color;
     (function (Color) {
         Color.Blue = 4;
-    })(M.Color || (M.Color = {}));
-    var Color = M.Color;
+    })(Color = M.Color || (M.Color = {}));
 })(M || (M = {}));
-var p = M.Color.Blue;
+var p = M.Color.Blue; // ok
 var M;
 (function (M) {
     function foo() {
@@ -71,10 +71,10 @@ var M;
 })(M || (M = {}));
 var M;
 (function (M) {
+    var foo;
     (function (foo) {
         foo.y = 2;
-    })(M.foo || (M.foo = {}));
-    var foo = M.foo;
+    })(foo = M.foo || (M.foo = {}));
 })(M || (M = {}));
 var M;
 (function (M) {
@@ -83,7 +83,7 @@ var M;
         foo.z = 1;
     })(foo || (foo = {}));
 })(M || (M = {}));
-M.foo();
-M.foo.x;
-M.foo.y;
-M.foo.z;
+M.foo(); // ok
+M.foo.x; // error
+M.foo.y; // ok
+M.foo.z; // error

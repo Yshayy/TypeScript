@@ -30,7 +30,7 @@ var Point = (function () {
     }
     Point.Origin = function () {
         return { x: 0, y: 0 };
-    };
+    }; // unexpected error here bug 840246
     return Point;
 })();
 var Point;
@@ -38,7 +38,7 @@ var Point;
     function Origin() {
         return null;
     }
-    Point.Origin = Origin;
+    Point.Origin = Origin; //expected duplicate identifier error
 })(Point || (Point = {}));
 var A;
 (function (A) {
@@ -49,15 +49,15 @@ var A;
         }
         Point.Origin = function () {
             return { x: 0, y: 0 };
-        };
+        }; // unexpected error here bug 840246
         return Point;
     })();
     A.Point = Point;
+    var Point;
     (function (Point) {
         function Origin() {
             return "";
         }
-        Point.Origin = Origin;
-    })(A.Point || (A.Point = {}));
-    var Point = A.Point;
+        Point.Origin = Origin; //expected duplicate identifier error
+    })(Point = A.Point || (A.Point = {}));
 })(A || (A = {}));

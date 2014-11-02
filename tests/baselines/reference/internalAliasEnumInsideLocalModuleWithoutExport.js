@@ -14,6 +14,7 @@ export module c {
 
 
 //// [internalAliasEnumInsideLocalModuleWithoutExport.js]
+var a;
 (function (a) {
     (function (weekend) {
         weekend[weekend["Friday"] = 0] = "Friday";
@@ -21,13 +22,12 @@ export module c {
         weekend[weekend["Sunday"] = 2] = "Sunday";
     })(a.weekend || (a.weekend = {}));
     var weekend = a.weekend;
-})(exports.a || (exports.a = {}));
-var a = exports.a;
+})(a = exports.a || (exports.a = {}));
+var c;
 (function (c) {
     var b = a.weekend;
     c.bVal = 2 /* Sunday */;
-})(exports.c || (exports.c = {}));
-var c = exports.c;
+})(c = exports.c || (exports.c = {}));
 
 
 //// [internalAliasEnumInsideLocalModuleWithoutExport.d.ts]
@@ -39,24 +39,6 @@ export declare module a {
     }
 }
 export declare module c {
+    import b = a.weekend;
     var bVal: b;
 }
-
-
-//// [DtsFileErrors]
-
-
-==== tests/cases/compiler/internalAliasEnumInsideLocalModuleWithoutExport.d.ts (1 errors) ====
-    export declare module a {
-        enum weekend {
-            Friday = 0,
-            Saturday = 1,
-            Sunday = 2,
-        }
-    }
-    export declare module c {
-        var bVal: b;
-                  ~
-!!! Cannot find name 'b'.
-    }
-    

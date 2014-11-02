@@ -34,6 +34,7 @@ var M;
         return C;
     })();
     M.C = C;
+    var C;
     (function (C) {
         var X = (function () {
             function X() {
@@ -41,10 +42,9 @@ var M;
             return X;
         })();
         C.X = X;
-    })(M.C || (M.C = {}));
-    var C = M.C;
+    })(C = M.C || (M.C = {}));
     var g1 = new G();
-    g1.bar(null).foo();
+    g1.bar(null).foo(); // no error
 })(M || (M = {}));
 var N;
 (function (N) {

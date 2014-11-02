@@ -9,22 +9,25 @@ export module outerModule.InnerModule {
 
 //// [commentsDottedModuleName.js]
 define(["require", "exports"], function (require, exports) {
+    /** this is multi declare module*/
+    var outerModule;
     (function (outerModule) {
+        var InnerModule;
         (function (InnerModule) {
+            /// class b comment
             var b = (function () {
                 function b() {
                 }
                 return b;
             })();
             InnerModule.b = b;
-        })(outerModule.InnerModule || (outerModule.InnerModule = {}));
-        var InnerModule = outerModule.InnerModule;
-    })(exports.outerModule || (exports.outerModule = {}));
-    var outerModule = exports.outerModule;
+        })(InnerModule = outerModule.InnerModule || (outerModule.InnerModule = {}));
+    })(outerModule = exports.outerModule || (exports.outerModule = {}));
 });
 
 
 //// [commentsDottedModuleName.d.ts]
+/** this is multi declare module*/
 export declare module outerModule.InnerModule {
     class b {
     }

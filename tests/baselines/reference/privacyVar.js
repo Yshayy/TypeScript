@@ -175,6 +175,7 @@ var glo_v23_private: glo_C2_private = new glo_C2_private();
 export var glo_v24_public: glo_C2_private = new glo_C2_private(); // error
 
 //// [privacyVar.js]
+var m1;
 (function (m1) {
     var C1_public = (function () {
         function C1_public() {
@@ -194,11 +195,11 @@ export var glo_v24_public: glo_C2_private = new glo_C2_private(); // error
             this.C3_v11_private = new C1_public();
             this.C3_v12_public = new C1_public();
             this.C3_v13_private = new C2_private();
-            this.C3_v14_public = new C2_private();
+            this.C3_v14_public = new C2_private(); // error
             this.C3_v21_private = new C1_public();
             this.C3_v22_public = new C1_public();
             this.C3_v23_private = new C2_private();
-            this.C3_v24_public = new C2_private();
+            this.C3_v24_public = new C2_private(); // error
         }
         return C3_public;
     })();
@@ -219,17 +220,16 @@ export var glo_v24_public: glo_C2_private = new glo_C2_private(); // error
     var m1_v1_private;
     m1.m1_v2_public;
     var m1_v3_private;
-    m1.m1_v4_public;
+    m1.m1_v4_public; // error
     var m1_v11_private = new C1_public();
     m1.m1_v12_public = new C1_public();
     var m1_v13_private = new C2_private();
-    m1.m1_v14_public = new C2_private();
+    m1.m1_v14_public = new C2_private(); //error 
     var m1_v21_private = new C1_public();
     m1.m1_v22_public = new C1_public();
     var m1_v23_private = new C2_private();
-    m1.m1_v24_public = new C2_private();
-})(exports.m1 || (exports.m1 = {}));
-var m1 = exports.m1;
+    m1.m1_v24_public = new C2_private(); // error
+})(m1 = exports.m1 || (exports.m1 = {}));
 var m2;
 (function (m2) {
     var m2_C1_public = (function () {
@@ -303,11 +303,11 @@ var glo_C3_public = (function () {
         this.glo_C3_v11_private = new glo_C1_public();
         this.glo_C3_v12_public = new glo_C1_public();
         this.glo_C3_v13_private = new glo_C2_private();
-        this.glo_C3_v14_public = new glo_C2_private();
+        this.glo_C3_v14_public = new glo_C2_private(); // error 
         this.glo_C3_v21_private = new glo_C1_public();
         this.glo_C3_v22_public = new glo_C1_public();
         this.glo_C3_v23_private = new glo_C2_private();
-        this.glo_C3_v24_public = new glo_C2_private();
+        this.glo_C3_v24_public = new glo_C2_private(); //error
     }
     return glo_C3_public;
 })();
@@ -328,12 +328,12 @@ var glo_C4_public = (function () {
 var glo_v1_private;
 exports.glo_v2_public;
 var glo_v3_private;
-exports.glo_v4_public;
+exports.glo_v4_public; // error
 var glo_v11_private = new glo_C1_public();
 exports.glo_v12_public = new glo_C1_public();
 var glo_v13_private = new glo_C2_private();
-exports.glo_v14_public = new glo_C2_private();
+exports.glo_v14_public = new glo_C2_private(); // error
 var glo_v21_private = new glo_C1_public();
 exports.glo_v22_public = new glo_C1_public();
 var glo_v23_private = new glo_C2_private();
-exports.glo_v24_public = new glo_C2_private();
+exports.glo_v24_public = new glo_C2_private(); // error

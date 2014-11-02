@@ -1865,6 +1865,44 @@ declare var Window: {
     new(): Window;
 }
 
+interface HTMLCollection extends MSHTMLCollectionExtensions {
+    /**
+      * Sets or retrieves the number of objects in a collection.
+      */
+    length: number;
+    /**
+      * Retrieves an object from various collections.
+      */
+    item(nameOrIndex?: any, optionalIndex?: any): Element;
+    /**
+      * Retrieves a select object or an object from an options collection.
+      */
+    namedItem(name: string): Element;
+    // [name: string]: Element;
+    [index: number]: Element;
+}
+declare var HTMLCollection: {
+    prototype: HTMLCollection;
+    new(): HTMLCollection;
+}
+
+interface BlobPropertyBag {
+    type?: string;
+    endings?: string;
+}
+
+interface Blob {
+    type: string;
+    size: number;
+    msDetachStream(): any;
+    slice(start?: number, end?: number, contentType?: string): Blob;
+    msClose(): void;
+}
+declare var Blob: {
+    prototype: Blob;
+    new (blobParts?: any[], options?: BlobPropertyBag): Blob;
+}
+
 interface NavigatorID {
     appVersion: string;
     appName: string;
@@ -3769,26 +3807,6 @@ interface MSCSSProperties extends CSSStyleDeclaration {
 declare var MSCSSProperties: {
     prototype: MSCSSProperties;
     new(): MSCSSProperties;
-}
-
-interface HTMLCollection extends MSHTMLCollectionExtensions {
-    /**
-      * Sets or retrieves the number of objects in a collection.
-      */
-    length: number;
-    /**
-      * Retrieves an object from various collections.
-      */
-    item(nameOrIndex?: any, optionalIndex?: any): Element;
-    /**
-      * Retrieves a select object or an object from an options collection.
-      */
-    namedItem(name: string): Element;
-    // [name: string]: Element;
-}
-declare var HTMLCollection: {
-    prototype: HTMLCollection;
-    new(): HTMLCollection;
 }
 
 interface SVGExternalResourcesRequired {
@@ -10024,18 +10042,6 @@ interface FileReader extends MSBaseReader {
 declare var FileReader: {
     prototype: FileReader;
     new(): FileReader;
-}
-
-interface Blob {
-    type: string;
-    size: number;
-    msDetachStream(): any;
-    slice(start?: number, end?: number, contentType?: string): Blob;
-    msClose(): void;
-}
-declare var Blob: {
-    prototype: Blob;
-    new(): Blob;
 }
 
 interface ApplicationCache extends EventTarget {

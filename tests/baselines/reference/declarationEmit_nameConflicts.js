@@ -28,7 +28,6 @@ export module M.P {
         export interface I { }
     }
     export import im = M.P.f;
-    // Bug 887180: Invalid .d.ts when an aliased entity is referenced, and a different entity is closer in scope
     export var a = M.a; // emitted incorrectly as typeof f
     export var b = M.b; // ok
     export var c = M.c; // ok
@@ -63,6 +62,7 @@ var f;
 module.exports = f;
 //// [declarationEmit_nameConflicts_0.js]
 var im = require('declarationEmit_nameConflicts_1');
+var M;
 (function (M) {
     function f() {
     }
@@ -73,20 +73,21 @@ var im = require('declarationEmit_nameConflicts_1');
         return C;
     })();
     M.C = C;
+    var N;
     (function (N) {
         function g() {
         }
         N.g = g;
         ;
-    })(M.N || (M.N = {}));
-    var N = M.N;
+    })(N = M.N || (M.N = {}));
     M.a = M.f;
     M.b = M.C;
     M.c = N;
     M.d = im;
-})(exports.M || (exports.M = {}));
-var M = exports.M;
+})(M = exports.M || (exports.M = {}));
+var M;
 (function (M) {
+    var P;
     (function (P) {
         function f() {
         }
@@ -97,24 +98,24 @@ var M = exports.M;
             return C;
         })();
         P.C = C;
+        var N;
         (function (N) {
             function g() {
             }
             N.g = g;
             ;
-        })(P.N || (P.N = {}));
-        var N = P.N;
+        })(N = P.N || (P.N = {}));
         P.im = M.P.f;
-        P.a = M.a;
-        P.b = M.b;
-        P.c = M.c;
-        P.g = M.c.g;
-        P.d = M.d;
-    })(M.P || (M.P = {}));
-    var P = M.P;
-})(exports.M || (exports.M = {}));
-var M = exports.M;
+        P.a = M.a; // emitted incorrectly as typeof f
+        P.b = M.b; // ok
+        P.c = M.c; // ok
+        P.g = M.c.g; // ok
+        P.d = M.d; // emitted incorrectly as typeof im
+    })(P = M.P || (M.P = {}));
+})(M = exports.M || (exports.M = {}));
+var M;
 (function (M) {
+    var Q;
     (function (Q) {
         function f() {
         }
@@ -125,17 +126,15 @@ var M = exports.M;
             return C;
         })();
         Q.C = C;
+        var N;
         (function (N) {
             function g() {
             }
             N.g = g;
             ;
-        })(Q.N || (Q.N = {}));
-        var N = Q.N;
-    })(M.Q || (M.Q = {}));
-    var Q = M.Q;
-})(exports.M || (exports.M = {}));
-var M = exports.M;
+        })(N = Q.N || (Q.N = {}));
+    })(Q = M.Q || (M.Q = {}));
+})(M = exports.M || (exports.M = {}));
 
 
 //// [declarationEmit_nameConflicts_1.d.ts]
@@ -145,6 +144,7 @@ declare module f {
 }
 export = f;
 //// [declarationEmit_nameConflicts_0.d.ts]
+import im = require('declarationEmit_nameConflicts_1');
 export declare module M {
     function f(): void;
     class C {
@@ -169,10 +169,10 @@ export declare module M.P {
         }
     }
     export import im = M.P.f;
-    var a: () => void;
+    var a: typeof M.f;
     var b: typeof M.C;
     var c: typeof M.N;
-    var g: () => void;
+    var g: typeof M.c.g;
     var d: typeof M.d;
 }
 export declare module M.Q {
@@ -186,74 +186,10 @@ export declare module M.Q {
     }
     interface b extends M.C {
     }
-    interface I extends M.N.I {
+    interface I extends M.c.I {
     }
     module c {
-        interface I extends M.N.I {
+        interface I extends M.c.I {
         }
     }
 }
-
-
-//// [DtsFileErrors]
-
-
-==== tests/cases/compiler/declarationEmit_nameConflicts_0.d.ts (1 errors) ====
-    export declare module M {
-        function f(): void;
-        class C {
-        }
-        module N {
-            function g(): void;
-            interface I {
-            }
-        }
-        export import a = M.f;
-        export import b = M.C;
-        export import c = N;
-        export import d = im;
-        ~~~~~~~~~~~~~~~~~~~~~
-!!! Cannot find name 'im'.
-    }
-    export declare module M.P {
-        function f(): void;
-        class C {
-        }
-        module N {
-            function g(): void;
-            interface I {
-            }
-        }
-        export import im = M.P.f;
-        var a: () => void;
-        var b: typeof M.C;
-        var c: typeof M.N;
-        var g: () => void;
-        var d: typeof M.d;
-    }
-    export declare module M.Q {
-        function f(): void;
-        class C {
-        }
-        module N {
-            function g(): void;
-            interface I {
-            }
-        }
-        interface b extends M.C {
-        }
-        interface I extends M.N.I {
-        }
-        module c {
-            interface I extends M.N.I {
-            }
-        }
-    }
-    
-==== tests/cases/compiler/declarationEmit_nameConflicts_1.d.ts (0 errors) ====
-    declare module f {
-        class c {
-        }
-    }
-    export = f;
-    

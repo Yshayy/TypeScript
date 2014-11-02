@@ -46,6 +46,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+var C;
 (function (C) {
     var A = (function () {
         function A() {
@@ -90,8 +91,7 @@ var __extends = this.__extends || function (d, b) {
         return D;
     })();
     C.D = D;
-})(exports.C || (exports.C = {}));
-var C = exports.C;
+})(C = exports.C || (exports.C = {}));
 exports.a;
 exports.b = C.F;
 exports.c = C.F2;
@@ -131,10 +131,10 @@ export declare module C {
     }
 }
 export declare var a: C.A<C.B>;
-export declare var b: <T>(x: T) => C.A<C.B>;
-export declare var c: <T>(x: T) => C.A<C.B>;
-export declare var d: <T>(x: T) => C.A<C.B>[];
-export declare var e: <T extends C.A<C.B>>(x: T) => C.A<C.B>[];
+export declare var b: typeof C.F;
+export declare var c: typeof C.F2;
+export declare var d: typeof C.F3;
+export declare var e: typeof C.F4;
 export declare var x: C.A<C.B>;
 export declare function f<T extends C.A<C.B>>(): void;
 export declare var g: C.A<C.B>;
@@ -142,4 +142,4 @@ export declare class h extends C.A<C.B> {
 }
 export interface i extends C.A<C.B> {
 }
-export declare var j: <T extends C.A<C.B>>(x: T) => T;
+export declare var j: typeof C.F6;

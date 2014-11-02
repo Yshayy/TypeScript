@@ -1,10 +1,7 @@
-==== tests/cases/conformance/parser/ecmascript5/RegularExpressions/parserRegularExpression2.ts (4 errors) ====
+tests/cases/conformance/parser/ecmascript5/RegularExpressions/parserRegularExpression2.ts(1,1): error TS2304: Cannot find name 'href'.
+
+
+==== tests/cases/conformance/parser/ecmascript5/RegularExpressions/parserRegularExpression2.ts (1 errors) ====
     href.match(/:\/\/(.[^/]+)/)[1];
-                          ~
-!!! ',' expected.
-                            ~
-!!! Expression expected.
-                              ~
-!!! Expression expected.
     ~~~~
-!!! Cannot find name 'href'.
+!!! error TS2304: Cannot find name 'href'.

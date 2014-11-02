@@ -21,7 +21,9 @@ module M.buz.plop {
 //// [mergedModuleDeclarationCodeGen5.js]
 var M;
 (function (_M) {
+    var buz;
     (function (buz) {
+        var plop;
         (function (plop) {
             function doom() {
             }
@@ -29,14 +31,14 @@ var M;
             function M() {
             }
             plop.M = M;
-        })(buz.plop || (buz.plop = {}));
-        var plop = buz.plop;
-    })(_M.buz || (_M.buz = {}));
-    var buz = _M.buz;
+        })(plop = buz.plop || (buz.plop = {}));
+    })(buz = _M.buz || (_M.buz = {}));
 })(M || (M = {}));
 var M;
 (function (M) {
+    var buz;
     (function (_buz) {
+        var plop;
         (function (_plop) {
             function gunk() {
             }
@@ -51,14 +53,13 @@ var M;
             (function (plop) {
             })(_plop.plop || (_plop.plop = {}));
             var plop = _plop.plop;
-            var v1 = gunk;
-            var v2 = buz;
-            _plop.v3 = _plop.doom;
-            _plop.v4 = _plop.M;
-            _plop.v5 = fudge;
-            _plop.v6 = plop;
-        })(_buz.plop || (_buz.plop = {}));
-        var plop = _buz.plop;
-    })(M.buz || (M.buz = {}));
-    var buz = M.buz;
+            // Emit these references as follows
+            var v1 = gunk; // gunk
+            var v2 = buz; // buz
+            _plop.v3 = _plop.doom; // _plop.doom
+            _plop.v4 = _plop.M; // _plop.M
+            _plop.v5 = fudge; // fudge
+            _plop.v6 = plop; // plop
+        })(plop = _buz.plop || (_buz.plop = {}));
+    })(buz = M.buz || (M.buz = {}));
 })(M || (M = {}));

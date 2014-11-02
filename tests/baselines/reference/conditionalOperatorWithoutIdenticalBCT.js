@@ -8,12 +8,11 @@ var x: X;
 var a: A;
 var b: B;
 
-//Expect to have compiler errors
-//Be not contextually typed
+// No errors anymore, uses union types
 true ? a : b;
 var result1 = true ? a : b;
 
-//Be contextually typed and and bct is not identical
+//Be contextually typed and and bct is not identical, results in errors that union type is not assignable to target
 var result2: A = true ? a : b;
 var result3: B = true ? a : b;
 
@@ -28,6 +27,7 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+//Cond ? Expr1 : Expr2,  Expr1 and Expr2 have no identical best common type
 var X = (function () {
     function X() {
     }
@@ -53,8 +53,10 @@ var B = (function (_super) {
 var x;
 var a;
 var b;
+// No errors anymore, uses union types
 true ? a : b;
 var result1 = true ? a : b;
+//Be contextually typed and and bct is not identical, results in errors that union type is not assignable to target
 var result2 = true ? a : b;
 var result3 = true ? a : b;
 var result4 = true ? function (m) { return m.propertyX1; } : function (n) { return n.propertyX2; };

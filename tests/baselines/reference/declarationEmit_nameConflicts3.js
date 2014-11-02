@@ -20,7 +20,6 @@ module M.P {
     export enum D {
         f
     }
-    // Bug 887180
     export var v: M.D; // ok
     export var w = M.D.f; // error, should be typeof M.D.f
     export var x = M.C.f; // error, should be typeof M.C.f
@@ -36,27 +35,28 @@ var __extends = this.__extends || function (d, b) {
 };
 var M;
 (function (M) {
+    var D;
     (function (D) {
         function f() {
         }
         D.f = f;
-    })(M.D || (M.D = {}));
-    var D = M.D;
+    })(D = M.D || (M.D = {}));
+    var C;
     (function (C) {
         function f() {
         }
         C.f = f;
-    })(M.C || (M.C = {}));
-    var C = M.C;
+    })(C = M.C || (M.C = {}));
+    var E;
     (function (E) {
         function f() {
         }
         E.f = f;
-    })(M.E || (M.E = {}));
-    var E = M.E;
+    })(E = M.E || (M.E = {}));
 })(M || (M = {}));
 var M;
 (function (M) {
+    var P;
     (function (P) {
         var C = (function () {
             function C() {
@@ -78,12 +78,11 @@ var M;
             D[D["f"] = 0] = "f";
         })(P.D || (P.D = {}));
         var D = P.D;
-        P.v;
-        P.w = M.D.f;
-        P.x = M.C.f;
-        P.x = M.E.f;
-    })(M.P || (M.P = {}));
-    var P = M.P;
+        P.v; // ok
+        P.w = M.D.f; // error, should be typeof M.D.f
+        P.x = M.C.f; // error, should be typeof M.C.f
+        P.x = M.E.f; // error, should be typeof M.E.f
+    })(P = M.P || (M.P = {}));
 })(M || (M = {}));
 
 
@@ -111,7 +110,7 @@ declare module M.P {
         f = 0,
     }
     var v: M.D;
-    var w: () => void;
-    var x: () => void;
-    var x: () => void;
+    var w: typeof M.D.f;
+    var x: typeof M.C.f;
+    var x: typeof M.C.f;
 }
